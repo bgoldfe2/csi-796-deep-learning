@@ -1,0 +1,18 @@
+.myheader {
+    text-align: center;
+}
+
+.myfooter {
+    position: fixed;
+    left: 50%;
+    bottom: 0px;
+    transform: translate(-50%, -50%);
+    margin: 0 auto;
+}
+
+body {
+    background-image:    url(image2vector.svg);
+    background-size:     cover;                      /* <------ */
+    background-repeat:   no-repeat;
+    background-position: center center;              /* optional, center the image */
+}
