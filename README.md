@@ -23,4 +23,4 @@ Within the notebooks, I will provide comments to identify which is the best valu
 
 # Automated Cloud Formation Scripts
 
-The instances should be created using the automated Cloud Formation script that are provided in the deploy folder.  This can be uploaded directly into the AWS CloudFormation Management Console or run on a local terminal using the AWS Command Line Interface (CLI). 
+The instances should be created using the automated Cloud Formation script provided in the deploy folder.  This can be uploaded directly into the AWS CloudFormation Management Console or run on a local terminal using the AWS Command Line Interface (CLI). 
