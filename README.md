@@ -1,6 +1,6 @@
 # GMU CSI 796 Deep Learning - Spring 2019
-## Jupyter notebooks for the book "Deep Learning with Python"
-## Adapted from material provided by Manning Publications
+> - ## Jupyter notebooks for the book "Deep Learning with Python"
+>> - ### Adapted from material provided by Manning Publications
 
 This repository contains Jupyter notebooks implementing the code samples found in the book [Deep Learning with Python (Manning Publications)](https://www.manning.com/books/deep-learning-with-python?a_aid=keras&a_bid=76564dff). The information contained within the notebooks have been modified to more concisely present the learning points using bullet lists.  Where code is modified from the original or added, these will all be commented with attribution and date.
 
