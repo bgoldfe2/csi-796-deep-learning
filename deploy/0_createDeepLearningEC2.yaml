@@ -1,0 +1,88 @@
+Mappings:
+  RegionMap:
+    us-east-1:
+      AMI: ami-060865e8b5914b4c4
+Outputs:
+  AZ:
+    Description: Availability Zone of the newly created EC2 instance
+    Value: !GetAtt 'Ec2Instance.AvailabilityZone'
+  InstanceId:
+    Description: InstanceId of the newly created EC2 instance
+    Value: !Ref 'Ec2Instance'
+  PrivateDNS:
+    Description: Private DNSName of the newly created EC2 instance
+    Value: !GetAtt 'Ec2Instance.PrivateDnsName'
+  PrivateIP:
+    Description: Private IP address of the newly created EC2 instance
+    Value: !GetAtt 'Ec2Instance.PrivateIp'
+  PublicDNS:
+    Description: Public DNSName of the newly created EC2 instance
+    Value: !GetAtt 'Ec2Instance.PublicDnsName'
+  PublicIP:
+    Description: Public IP address of the newly created EC2 instance
+    Value: !GetAtt 'Ec2Instance.PublicIp'
+Parameters:
+  ExternalIP:
+    Default: 96.91.213.169/32
+    Description: external ip of client
+    Type: String
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
+    Type: String
+Resources:
+  Ec2Instance:
+    Properties:
+      ImageId: !FindInMap
+        - RegionMap
+        - !Ref 'AWS::Region'
+        - AMI
+      InstanceType: p2.xlarge
+      KeyName: !Ref 'KeyName'
+      SecurityGroups:
+        - !Ref 'simpleSg'
+      UserData: !Base64
+        Fn::Join:
+          - ''
+          - - "#!/bin/bash\n"
+            - "su ubuntu\n"
+            - "pwd && whoami\n"
+            - "echo \". /home/ubuntu/anaconda3/etc/profile.d/conda.sh\" >> ~/.bashrc\n"
+            - "echo \"conda activate\" >> ~/.bashrc\n"
+            - "source ~/.bashrc\n"
+            - "conda activate tensorflow_p36\n"
+            - "mkdir ssl\n"
+            - "cd ssl\n"
+            - "openssl req -x509 -nodes -days 365 -newkey rsa:1024 -keyout \"cert.key\"\
+              \ -out \"cert.pem\" -batch\n"
+            - "#jupyter notebook --generate-config\n"
+            - "echo \"about to append\"\n"
+            - "ed -s /home/ubuntu/.jupyter/jupyter_notebook_config.py <<EOT\n"
+            - "1i\n"
+            - "c = get_config()\n"
+            - "c.NotebookApp.certfile = u'/home/ubuntu/ssl/cert.pem'\n"
+            - "c.NotebookApp.keyfile = u'/home/ubuntu/ssl/cert.key'\n"
+            - "c.IPKernelApp.pylab = 'inline'\n"
+            - "'c.NotebookApp.ip = '*'\n"
+            - "c.NotebookApp.open_browser = False\n"
+            - "c.NotebookApp.password = 'sha1:b592a9cf2ec6:b99edb2fd3d0727e336185a0b0eab561aa533a43'\n"
+            - ".\n"
+            - "w\n"
+            - "q\n"
+            - "EOT\n"
+            - "echo \"after the append\"\n"
+            - "sudo pip install keras --upgrade\n"
+            - "rm -f ~/.keras/keras.json\n"
+    Type: AWS::EC2::Instance
+  simpleSg:
+    Properties:
+      GroupDescription: 'Simple Security Group: Enable SSH access via port 22'
+      SecurityGroupIngress:
+        - CidrIp: !Ref 'ExternalIP'
+          FromPort: '22'
+          IpProtocol: tcp
+          ToPort: '22'
+        - CidrIp: !Ref 'ExternalIP'
+          FromPort: '8888'
+          IpProtocol: tcp
+          ToPort: '8888'
+    Type: AWS::EC2::SecurityGroup
